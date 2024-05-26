@@ -1,55 +1,45 @@
-import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { useEffect } from "react";
+import { openDb } from './api/IndexedDb';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/home';
+import Setting from './pages/Setting';
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Content from "./templates/Content";
 
-function App() {
-  const [count, setCount] = useState(0);
-  const [text, setText] = useState({});
+const App = () => {
+
+  // ** Define Your Navigation Route Here
+  const routeList = [
+    {
+      path: "/", component: <Content><Home /></Content>
+    },
+    {
+      path: "/setting", component: <Content><Setting /></Content>
+    },
+    {
+      path: "/register", component: <Register />
+    },
+    {
+      path: "/login", component: <Login />
+    }
+  ]
 
   useEffect(() => {
-    (async function () {
-      let chrome = window.versions.chrome();
-      let node = window.versions.node();
-      let electron = window.versions.electron();
-
-      setText({ chrome, node, electron });
-    })();
+    openDb().then(database => {
+      return database
+    }).catch(error => {
+      console.error('Error:', error);
+    });
   }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://electronjs.org" target="_blank">
-          <img
-            src="https://www.electronjs.org/assets/img/logo.svg"
-            className="logo"
-            alt="Electron logo"
-          />
-        </a>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Electron + Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> for react code and
-          <code>./electron.cjs</code> for electron code
-        </p>
-      </div>
-      <p className="versions">
-        This app is using Chrome (v{text?.chrome}), Node.js (v{text?.node}), and
-        Electron (v{text?.electron})
-      </p>
-    </>
+    <Routes>
+      {routeList.map((route, index) => (
+        <Route key={index} path={route.path} element={route.component} />
+      ))}
+    </Routes>
   );
-}
+};
 
 export default App;
